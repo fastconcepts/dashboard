@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    const EMAILJS_CONFIG = {
+      publicKey: 'u3fSE6bD9egjQM_nS',
+      serviceId: 'service_oteoa3v',
+      templateId: 'template_f3jpuqx'
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .header h1 {
+      color: #333;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    .verification-code {
+      font-family: monospace;
+      font-size: 24px;
+      letter-spacing: 8px;
+      text-align: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .timer {
+      text-align: center;
+      color: #dc3545;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    .timer.warning {
+      color: #ffc107;
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .role-list {
+      list-style: none;
+    }
+
+    .role-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .role-item:last-child {
+      border-bottom: none;
+    }
+
+    .role-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .navbar {
+      background: #343a40;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar .btn {
+      flex: 1;
+      text-align: center;
+    }
+
+    .toolbar .btn.active {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>Administrator Dashboard</h1>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Gebruikersbeheer</h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="newUserBtn">Nieuwe gebruiker</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-secondary active" id="usersTab">Gebruikers</button>
+      <button class="btn btn-secondary" id="rolesTab">Rollen beheren</button>
+    </div>
+
+    <div id="usersView">
+      <div class="card">
+        <h2>Gebruikers</h2>
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>Naam</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+          </tbody>
+        </table>
+        <div class="empty-state" id="noUsers">
+          <p>Nog geen gebruikers. Maak een nieuwe gebruiker aan.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="rolesView" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2>Rollen</h2>
+          <button class="btn btn-primary" id="newRoleBtn">Nieuwe rol</button>
+        </div>
+        <ul class="role-list" id="rolesList">
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <h2 id="userModalTitle">Nieuwe gebruiker</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Voornaam *</label>
+          <input type="text" id="voornaam">
+        </div>
+        <div class="form-group">
+          <label>Tussenvoegsel</label>
+          <input type="text" id="tussenvoegsel">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Achternaam *</label>
+          <input type="text" id="achternaam">
+        </div>
+        <div class="form-group">
+          <label>Rol *</label>
+          <select id="rolSelect">
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Emailadres *</label>
+        <input type="email" id="emailadres">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelUserBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveUserBtn">Gebruiker aanmaken</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Modal -->
+  <div class="modal-overlay" id="roleModal">
+    <div class="modal">
+      <h2 id="roleModalTitle">Nieuwe rol</h2>
+      <div class="form-group">
+        <label>Rolnaam *</label>
+        <input type="text" id="roleNaam">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelRoleBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveRoleBtn">Rol aanmaken</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Modal -->
+  <div class="modal-overlay" id="verificationModal">
+    <div class="modal">
+      <h2>Email verificatie</h2>
+      <p>Er is een verificatiecode verzonden naar <strong id="verifyEmail"></strong></p>
+      <p id="emailStatus" style="font-size: 12px; color: #666; margin-top: 5px;">Controleer je inbox (en spam)</p>
+      
+      <div id="verificationForm">
+        <div class="error-message" id="verificationError" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label>Voer verificatiecode in</label>
+          <input type="text" id="verifyCode" placeholder="6-cijferige code" style="text-align: center; letter-spacing: 5px; font-size: 18px;" maxlength="6">
+        </div>
+        
+        <div class="timer" id="timer">Nog 120 seconden</div>
+      </div>
+
+      <div class="success-message" id="verificationSuccess" style="display: none;">
+        Verificatie succesvol! Gebruiker wordt opgeslagen...
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelVerifyBtn">Annuleren</button>
+        <button class="btn btn-secondary" id="resendCodeBtn">Code opnieuw verzenden</button>
+        <button class="btn btn-primary" id="verifyBtn">Verifieer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <h2>Gebruiker verwijderen</h2>
+      <p>Weet u zeker dat u <strong id="deleteUserName"></strong> wilt verwijderen?</p>
+      <p style="color: #666; margin-top: 10px;">Deze actie kan niet ongedaan worden gemaakt.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Annuleren</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Ja, verwijderen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data
+    let users = [];
+    let roles = [
+      { id: '1', naam: 'Gebruiker' },
+      { id: '2', naam: 'Beheerder' },
+      { id: '3', naam: 'Moderator' }
+    ];
+    
+    // State
+    let editingUserId = null;
+    let editingRoleId = null;
+    let deleteUserId = null;
+    let pendingUser = null;
+    let verificationCode = null;
+    let timerInterval = null;
+    let timeLeft = 120;
+
+    // DOM Elements
+    const usersView = document.getElementById('usersView');
+    const rolesView = document.getElementById('rolesView');
+    const usersTab = document.getElementById('usersTab');
+    const rolesTab = document.getElementById('rolesTab');
+    const userModal = document.getElementById('userModal');
+    const roleModal = document.getElementById('roleModal');
+    const verificationModal = document.getElementById('verificationModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const usersTableBody = document.getElementById('usersTableBody');
+    const noUsers = document.getElementById('noUsers');
+    const rolesList = document.getElementById('rolesList');
+
+    // Initialize
+    function init() {
+      populateRoleSelect();
+      renderUsers();
+      renderRoles();
+      setupEventListeners();
+      
+      // Initialize EmailJS
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+      }
+    }
+
+    function setupEventListeners() {
+      // Tab switching
+      usersTab.addEventListener('click', () => {
+        usersTab.classList.add('active');
+        rolesTab.classList.remove('active');
+        usersView.style.display = 'block';
+        rolesView.style.display = 'none';
+      });
+
+      rolesTab.addEventListener('click', () => {
+        rolesTab.classList.add('active');
+        usersTab.classList.remove('active');
+        rolesView.style.display = 'block';
+        usersView.style.display = 'none';
+      });
+
+      // User modal
+      document.getElementById('newUserBtn').addEventListener('click', openNewUserModal);
+      document.getElementById('cancelUserBtn').addEventListener('click', closeUserModal);
+      document.getElementById('saveUserBtn').addEventListener('click', saveUser);
+
+      // Role modal
+      document.getElementById('newRoleBtn').addEventListener('click', openNewRoleModal);
+      document.getElementById('cancelRoleBtn').addEventListener('click', closeRoleModal);
+      document.getElementById('saveRoleBtn').addEventListener('click', saveRole);
+
+      // Verification modal
+      document.getElementById('cancelVerifyBtn').addEventListener('click', closeVerificationModal);
+      document.getElementById('verifyBtn').addEventListener('click', verifyCode);
+      document.getElementById('resendCodeBtn').addEventListener('click', resendCode);
+
+      // Delete modal
+      document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+      document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+      // Verify code input
+      document.getElementById('verifyCode').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+      });
+    }
+
+    function populateRoleSelect() {
+      const select = document.getElementById('rolSelect');
+      select.innerHTML = roles.map(r => `<option value="${r.naam}">${r.naam}</option>`).join('');
+    }
+
+    function renderUsers() {
+      if (users.length === 0) {
+        usersTableBody.innerHTML = '';
+        noUsers.style.display = 'block';
+        return;
+      }
+
+      noUsers.style.display = 'none';
+      usersTableBody.innerHTML = users.map(user => `
+        <tr>
+          <td>${user.voornaam} ${user.tussenvoegsel} ${user.achternaam}</td>
+          <td>${user.emailadres}</td>
+          <td>${user.rol}</td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editUser('${user.id}')">Wijzig</button>
+            <button class="btn btn-danger btn-small" onclick="deleteUser('${user.id}')" style="margin-left: 5px;">Verwijder</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRoles() {
+      rolesList.innerHTML = roles.map(role => `
+        <li class="role-item">
+          <span>${role.naam}</span>
+          <div class="role-actions">
+            <button class="btn btn-secondary btn-small" onclick="editRole('${role.id}')">Wijzig</button>
+            <button class="btn btn-danger btn-small" onclick="deleteRole('${role.id}')" style="margin-left: 5px;">Verwijder</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // User functions
+    function openNewUserModal() {
+      editingUserId = null;
+      document.getElementById('userModalTitle').textContent = 'Nieuwe gebruiker';
+      document.getElementById('voornaam').value = '';
+      document.getElementById('tussenvoegsel').value = '';
+      document.getElementById('achternaam').value = '';
+      document.getElementById('emailadres').value = '';
+      populateRoleSelect();
+      document.getElementById('saveUserBtn').textContent = 'Gebruiker aanmaken';
+      userModal.classList.add('active');
+    }
+
+    function editUser(id) {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+
+      editingUserId = id;
+      document.getElementById('userModalTitle').textContent = 'Gebruiker wijzigen';
+      document.getElementById('voornaam').value = user.voornaam;
+      document.getElementById('tussenvoegsel').value = user.tussenvoegsel;
+      document.getElementById('achternaam').value = user.achternaam;
+      document.getElementById('emailadres').value = user.emailadres;
+      populateRoleSelect();
+      document.getElementById('rolSelect').value = user.rol;
+      document.getElementById('saveUserBtn').textContent = 'Wijzigingen opslaan';
+      userModal.classList.add('active');
+    }
+
+    function closeUserModal() {
+      userModal.classList.remove('active');
+      editingUserId = null;
+    }
+
+    function saveUser() {
+      const voornaam = document.getElementById('voornaam').value.trim();
+      const tussenvoegsel = document.getElementById('tussenvoegsel').value.trim();
+      const achternaam = document.getElementById('achternaam').value.trim();
+      const emailadres = document.getElementById('emailadres').value.trim();
+      const rol = document.getElementById('rolSelect').value;
+
+      if (!voornaam || !achternaam || !emailadres) {
+        alert('Vul alle verplichte velden in');
+        return;
+      }
+
+      pendingUser = {
+        id: editingUserId || Date.now().toString(),
+        voornaam,
+        tussenvoegsel,
+        achternaam,
+        emailadres,
+        rol
+      };
+
+      verificationCode = generateCode();
+      
+      // Verstuur verificatie email
+      sendVerificationEmail(emailadres, verificationCode, voornaam);
+      
+      document.getElementById('verifyEmail').textContent = emailadres;
+      closeUserModal();
+      openVerificationModal();
+    }
+
+    function deleteUser(id) {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+
+      deleteUserId = id;
+      document.getElementById('deleteUserName').textContent = `${user.voornaam} ${user.tussenvoegsel} ${user.achternaam}`.replace(/\s+/g, ' ').trim();
+      deleteModal.classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      deleteModal.classList.remove('active');
+      deleteUserId = null;
+    }
+
+    function confirmDelete() {
+      if (deleteUserId) {
+        users = users.filter(u => u.id !== deleteUserId);
+        renderUsers();
+        closeDeleteModal();
+      }
+    }
+
+    // Role functions
+    function openNewRoleModal() {
+      editingRoleId = null;
+      document.getElementById('roleModalTitle').textContent = 'Nieuwe rol';
+      document.getElementById('roleNaam').value = '';
+      document.getElementById('saveRoleBtn').textContent = 'Rol aanmaken';
+      roleModal.classList.add('active');
+    }
+
+    function editRole(id) {
+      const role = roles.find(r => r.id === id);
+      if (!role) return;
+
+      editingRoleId = id;
+      document.getElementById('roleModalTitle').textContent = 'Rol wijzigen';
+      document.getElementById('roleNaam').value = role.naam;
+      document.getElementById('saveRoleBtn').textContent = 'Wijzigingen opslaan';
+      roleModal.classList.add('active');
+    }
+
+    function closeRoleModal() {
+      roleModal.classList.remove('active');
+      editingRoleId = null;
+    }
+
+    function saveRole() {
+      const naam = document.getElementById('roleNaam').value.trim();
+      
+      if (!naam) {
+        alert('Vul een rolnaam in');
+        return;
+      }
+
+      if (editingRoleId) {
+        roles = roles.map(r => r.id === editingRoleId ? { ...r, naam } : r);
+      } else {
+        roles.push({ id: Date.now().toString(), naam });
+      }
+
+      renderRoles();
+      closeRoleModal();
+    }
+
+    function deleteRole(id) {
+      if (roles.length <= 1) {
+        alert('Er moet minimaal één rol zijn');
+        return;
+      }
+      
+      const role = roles.find(r => r.id === id);
+      if (users.some(u => u.rol === role.naam)) {
+        alert('Deze rol wordt nog gebruikt door gebruikers');
+        return;
+      }
+
+      roles = roles.filter(r => r.id !== id);
+      renderRoles();
+    }
+
+    // Verification functions
+    function generateCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function sendVerificationEmail(email, code, voornaam) {
+      // Valideer email adres
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        console.error('Ongeldig email adres:', email);
+        alert('Ongeldig emailadres. Vul een geldig emailadres in.');
+        return;
+      }
+
+      // Check of EmailJS is geconfigureerd
+      if (EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY' || 
+          !EMAILJS_CONFIG.publicKey || 
+          !EMAILJS_CONFIG.serviceId || 
+          !EMAILJS_CONFIG.templateId) {
+        console.log(`Verificatiecode voor ${email}: ${code} (EmailJS niet geconfigureerd - zie console)`);
+        return;
+      }
+
+      console.log('Versturen naar:', email, 'met code:', code);
+      
+      const templateParams = {
+        to_name: voornaam || 'Gebruiker',
+        from_name: 'Admin Dashboard',
+        verification_code: code,
+        expiry_time: '2 minuten'
+      };
+
+      console.log('Template params:', templateParams);
+
+      emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams)
+        .then(() => {
+          console.log(`Verificatiecode verstuurd naar ${email}: ${code}`);
+        })
+        .catch((error) => {
+          console.error('Email versturen mislukt:', error);
+          console.log(`Verificatiecode voor ${email}: ${code} (fallback naar console)`);
+        });
+    }
+
+    function openVerificationModal() {
+      timeLeft = 120;
+      document.getElementById('verifyCode').value = '';
+      document.getElementById('verificationError').style.display = 'none';
+      document.getElementById('verificationForm').style.display = 'block';
+      document.getElementById('verificationSuccess').style.display = 'none';
+      verificationModal.classList.add('active');
+      
+      startTimer();
+    }
+
+    function closeVerificationModal() {
+      verificationModal.classList.remove('active');
+      stopTimer();
+      pendingUser = null;
+      verificationCode = null;
+    }
+
+    function startTimer() {
+      stopTimer();
+      updateTimerDisplay();
+      
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          document.getElementById('verificationError').textContent = 'Code is verlopen. Vraag een nieuwe code aan.';
+          document.getElementById('verificationError').style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer');
+      timerEl.textContent = `Nog ${timeLeft} seconden`;
+      timerEl.className = timeLeft <= 30 ? 'timer warning' : 'timer';
+    }
+
+    function verifyCode() {
+      const enteredCode = document.getElementById('verifyCode').value;
+      
+      if (enteredCode === verificationCode) {
+        document.getElementById('verificationForm').style.display = 'none';
+        document.getElementById('verificationSuccess').style.display = 'block';
+        
+        setTimeout(() => {
+          if (editingUserId) {
+            users = users.map(u => u.id === editingUserId ? pendingUser : u);
+          } else {
+            users.push(pendingUser);
+          }
+          
+          renderUsers();
+          closeVerificationModal();
+          populateRoleSelect();
+        }, 1500);
+      } else {
+        document.getElementById('verificationError').textContent = 'Onjuiste code. Probeer het opnieuw.';
+        document.getElementById('verificationError').style.display = 'block';
+      }
+    }
+
+    function resendCode() {
+      verificationCode = generateCode();
+      if (pendingUser) {
+        sendVerificationEmail(pendingUser.emailadres, verificationCode, pendingUser.voornaam);
+      }
+      timeLeft = 120;
+      document.getElementById('verificationError').style.display = 'none';
+      startTimer();
+    }
+
+    // Start app
+    init();
+  </script>
+</body>
+</html>
