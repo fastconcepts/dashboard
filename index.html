@@ -739,6 +739,7 @@
       console.log('Versturen naar:', email, 'met code:', code);
       
       const templateParams = {
+        to_email: email,
         to_name: voornaam || 'Gebruiker',
         from_name: 'Admin Dashboard',
         verification_code: code,
