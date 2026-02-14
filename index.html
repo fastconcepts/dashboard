@@ -739,7 +739,6 @@
       console.log('Versturen naar:', email, 'met code:', code);
       
       const templateParams = {
-        to_email: email,
         to_name: voornaam || 'Gebruiker',
         from_name: 'Admin Dashboard',
         verification_code: code,
@@ -747,8 +746,11 @@
       };
 
       console.log('Template params:', templateParams);
+      console.log('Email:', email);
 
-      emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams)
+      emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams, {
+        to: [email]
+      })
         .then(() => {
           console.log(`Verificatiecode verstuurd naar ${email}: ${code}`);
         })
