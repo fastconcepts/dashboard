@@ -1,0 +1,2983 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    const EMAILJS_CONFIG = {
+      publicKey: 'u3fSE6bD9egjQM_nS',
+      serviceId: 'service_oteoa3v',
+      loginTemplateId: 'template_o5p81ny',
+      templateId: 'template_f3jpuqx'
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .header h1 {
+      color: #333;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .stat-card-success .stat-number {
+      color: #28a745;
+    }
+
+    .stat-card-warning .stat-number {
+      color: #ffc107;
+    }
+
+    .stat-card-danger .stat-number {
+      color: #dc3545;
+    }
+
+    .pending-user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .pending-user-item:last-child {
+      border-bottom: none;
+    }
+
+    .pending-user-info {
+      flex: 1;
+    }
+
+    .pending-user-name {
+      font-weight: 600;
+    }
+
+    .pending-user-email {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .pending-user-date {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .pending-user-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .permissions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .permission-switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+
+    .permission-switch span {
+      font-weight: 500;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #28a745;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    .verification-code {
+      font-family: monospace;
+      font-size: 24px;
+      letter-spacing: 8px;
+      text-align: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .timer {
+      text-align: center;
+      color: #dc3545;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    .timer.warning {
+      color: #ffc107;
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .role-list {
+      list-style: none;
+    }
+
+    .role-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .role-item > div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .role-name {
+      font-weight: 600;
+    }
+
+    .role-permissions {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .role-item:last-child {
+      border-bottom: none;
+    }
+
+    .role-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .blogs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .blog-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .blog-card-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .blog-card-content {
+      padding: 15px;
+    }
+
+    .blog-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .blog-card-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .blog-card-meta {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .blog-card-tags {
+      margin: 8px 0;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e9ecef;
+      color: #495057;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      margin-right: 5px;
+    }
+
+    .blog-card-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 5px;
+      padding: 5px;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .editor-btn {
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    .editor-btn:hover {
+      background: #e9ecef;
+    }
+
+    .editor-content:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    .editor-content img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .image-upload-container {
+      border: 2px dashed #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .image-upload-container input[type="file"] {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .image-upload-preview {
+      margin-top: 10px;
+    }
+
+    .image-upload-preview img {
+      display: block;
+      max-width: 100%;
+      max-height: 200px;
+      margin: 0 auto 10px;
+      border-radius: 5px;
+    }
+
+    .navbar {
+      background: #343a40;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar .btn {
+      flex: 1;
+      text-align: center;
+    }
+
+    .toolbar .btn.active {
+      background: #007bff;
+      color: white;
+    }
+
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .login-tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .login-tabs .btn {
+      flex: 1;
+      text-align: center;
+    }
+
+    .login-tabs .btn.active {
+      background: #007bff;
+      color: white;
+    }
+
+    .success-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .user-info .btn {
+      background: #6c757d;
+      color: white;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .input-error {
+      border-color: #dc3545 !important;
+    }
+
+    .error-text {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>Administrator Dashboard</h1>
+    <div class="user-info" id="userInfo" style="display: none;">
+      <img id="userProfilePhoto" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 10px; display: none;">
+      <span id="loggedInUser"></span>
+      <button class="btn" id="logoutBtn">Uitloggen</button>
+    </div>
+  </nav>
+
+  <!-- Login/Register Section -->
+  <div id="loginSection" style="display: none;">
+    <div class="login-container">
+      <div class="login-tabs">
+        <button class="btn btn-secondary active" id="loginTab">Inloggen</button>
+        <button class="btn btn-secondary" id="registerTab">Aanmelden</button>
+      </div>
+      
+      <!-- Login Form -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label>Emailadres</label>
+          <input type="email" id="loginEmail">
+        </div>
+        <div class="form-group" id="loginCodeGroup" style="display: none;">
+          <label>Verificatiecode</label>
+          <input type="text" id="loginCode" maxlength="6" placeholder="6-cijferige code" style="text-align: center; letter-spacing: 5px;">
+        </div>
+        <div class="error-message" id="loginError" style="display: none;"></div>
+        <button class="btn btn-primary" style="width: 100%;" id="sendCodeBtn">
+          <span id="sendCodeBtnText">Verstuur verificatiecode</span>
+          <span id="sendCodeBtnSpinner" class="spinner" style="display: none;">&#9696;</span>
+        </button>
+        <button class="btn btn-primary" style="width: 100%; display: none;" id="loginBtn">Inloggen met code</button>
+      </div>
+      
+      <!-- Register Form -->
+      <div id="registerForm" style="display: none;">
+        <p style="text-align: center; margin-bottom: 20px; color: #666;">
+          Maak een account aan. Na registratie kun je direct inloggen.
+        </p>
+        <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+          <label>Profielfoto</label>
+          <div id="profilePhotoUpload">
+            <input type="file" id="regProfilePhoto" accept="image/*" onchange="handleProfilePhotoUpload(this)">
+          </div>
+          <div id="profilePhotoPreview" style="display: none; margin-top: 10px;">
+            <img id="profilePhotoImg" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+            <button type="button" class="btn btn-danger btn-small" onclick="removeProfilePhoto()" style="display: block; margin: 10px auto 0;">Verwijder</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Voornaam *</label>
+            <input type="text" id="regVoornaam">
+          </div>
+          <div class="form-group">
+            <label>Tussenvoegsel</label>
+            <input type="text" id="regTussenvoegsel">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Achternaam *</label>
+            <input type="text" id="regAchternaam">
+          </div>
+          <div class="form-group">
+            <label>Emailadres *</label>
+            <input type="email" id="regEmailadres">
+          </div>
+        </div>
+        <div class="error-message" id="registerError" style="display: none;"></div>
+        <div class="success-message" id="registerSuccess" style="display: none;"></div>
+        <button class="btn btn-primary" style="width: 100%;" id="registerBtn">Account aanmaken</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="mainContent" style="display: none;">
+    <div class="toolbar">
+      <button class="btn btn-secondary active" id="dashboardTab">Dashboard</button>
+      <button class="btn btn-secondary" id="usersTab">Gebruikers</button>
+      <button class="btn btn-secondary" id="rolesTab">Rollen beheren</button>
+      <button class="btn btn-secondary" id="blogtypesTab">Blogtypes</button>
+      <button class="btn btn-secondary" id="blogpostsTab">Blogposts</button>
+    </div>
+
+    <div id="dashboardView">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="totalUsers">0</div>
+          <div class="stat-label">Totaal gebruikers</div>
+        </div>
+        <div class="stat-card stat-card-success">
+          <div class="stat-number" id="activeUsers">0</div>
+          <div class="stat-label">Actieve gebruikers</div>
+        </div>
+        <div class="stat-card stat-card-warning" id="pendingCard" style="cursor: pointer;">
+          <div class="stat-number" id="pendingUsers">0</div>
+          <div class="stat-label">Nieuwe gebruikers (goedkeuring)</div>
+        </div>
+        <div class="stat-card stat-card-danger">
+          <div class="stat-number" id="blockedUsers">0</div>
+          <div class="stat-label">Geblokkeerde gebruikers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalBlogTypes">0</div>
+          <div class="stat-label">Blogtypes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalBlogPosts">0</div>
+          <div class="stat-label">Blogposts</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="usersView">
+      <div class="header">
+        <h1>Gebruikersbeheer</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="newUserBtn">Nieuwe gebruiker</button>
+        </div>
+      </div>
+      <div class="card" id="pendingUsersCard" style="display: none;">
+        <h2>In afwachting van goedkeuring</h2>
+        <div id="pendingUsersList"></div>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2>Gebruikers</h2>
+          <input type="text" id="userSearchInput" placeholder="Zoeken..." style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 250px;">
+        </div>
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>Naam</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Status</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+          </tbody>
+        </table>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;" id="paginationControls">
+        </div>
+        <div class="empty-state" id="noUsers">
+          <p>Nog geen gebruikers.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="rolesView" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2>Rollen</h2>
+          <button class="btn btn-primary" id="newRoleBtn">Nieuwe rol</button>
+        </div>
+        <ul class="role-list" id="rolesList">
+        </ul>
+      </div>
+    </div>
+
+    <div id="blogtypesView" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2>Blogtypes</h2>
+          <button class="btn btn-primary" id="newBlogtypeBtn">Nieuw Blogtype</button>
+        </div>
+        <div id="blogsList" class="blogs-grid">
+        </div>
+        <div class="empty-state" id="noBlogs">
+          <p>Nog geen blogtypes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="blogpostsView" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2>Blogposts</h2>
+          <button class="btn btn-primary" id="newBlogpostBtn">Nieuwe blogpost</button>
+        </div>
+        <div id="blogpostsList" class="blogs-grid">
+        </div>
+        <div class="empty-state" id="noBlogposts">
+          <p>Nog geen blogposts. Maak een nieuwe blogpost aan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <h2 id="userModalTitle">Nieuwe gebruiker</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Voornaam *</label>
+          <input type="text" id="voornaam">
+        </div>
+        <div class="form-group">
+          <label>Tussenvoegsel</label>
+          <input type="text" id="tussenvoegsel">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Achternaam *</label>
+          <input type="text" id="achternaam">
+        </div>
+        <div class="form-group">
+          <label>Rol *</label>
+          <select id="rolSelect">
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Emailadres *</label>
+        <input type="email" id="emailadres">
+        <div class="error-text" id="userEmailError" style="display: none;"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelUserBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveUserBtn">Gebruiker aanmaken</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Modal -->
+  <div class="modal-overlay" id="roleModal">
+    <div class="modal">
+      <h2 id="roleModalTitle">Nieuwe rol</h2>
+      <div class="form-group">
+        <label>Rolnaam *</label>
+        <input type="text" id="roleNaam">
+      </div>
+      <div id="permissionsContainer"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelRoleBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveRoleBtn">Rol aanmaken</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blogpost Modal -->
+  <div class="modal-overlay" id="blogModal">
+    <div class="modal" style="max-width: 700px;">
+      <h2 id="blogModalTitle">Nieuwe blogpost</h2>
+      <div class="form-group">
+        <label>Titel *</label>
+        <input type="text" id="blogTitel">
+        <div class="error-text" id="blogTitelError" style="display: none;"></div>
+      </div>
+      <div class="form-group">
+        <label>Blogtype *</label>
+        <select id="blogTypeSelect"></select>
+      </div>
+      <div class="form-group">
+        <label>Tags (kommagescheiden)</label>
+        <input type="text" id="blogTags" placeholder="bijv: nieuws, evenement, update">
+      </div>
+      <div class="form-group">
+        <label>Tekst *</label>
+        <div class="editor-toolbar">
+          <button type="button" class="editor-btn" onclick="execCmd('bold')" title="Vet"><b>B</b></button>
+          <button type="button" class="editor-btn" onclick="execCmd('italic')" title="Cursief"><i>I</i></button>
+          <button type="button" class="editor-btn" onclick="execCmd('underline')" title="Onderstreept"><u>U</u></button>
+          <button type="button" class="editor-btn" onclick="execCmd('insertUnorderedList')" title="Lijst met bullets">&#8226;</button>
+          <button type="button" class="editor-btn" onclick="execCmd('insertOrderedList')" title="Genummerde lijst">1.</button>
+        </div>
+        <div id="blogOmschrijving" class="editor-content" contenteditable="true" style="min-height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; overflow-y: auto;"></div>
+        <div class="error-text" id="blogOmschrijvingError" style="display: none;"></div>
+      </div>
+      <div class="form-group">
+        <label>Afbeelding (min 900x300) *</label>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <button type="button" class="btn btn-secondary btn-small" onclick="showImageLibrary()">Bibliotheek</button>
+          <button type="button" class="btn btn-secondary btn-small" onclick="document.getElementById('blogImageFile').click()">Uploaden</button>
+        </div>
+        <input type="file" id="blogImageFile" accept="image/*" onchange="handleImageUpload(this)" style="display: none;">
+        <div id="imageUploadPreview" class="image-upload-preview" style="display: none;">
+          <img id="uploadedImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
+          <button type="button" class="btn btn-danger btn-small" onclick="removeUploadedImage()">Verwijder</button>
+        </div>
+        <div class="error-text" id="blogAfbeeldingError" style="display: none;"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelBlogBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveBlogBtn">Blogpost opslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blogtype Modal -->
+  <div class="modal-overlay" id="blogtypeModal">
+    <div class="modal" style="max-width: 600px;">
+      <h2 id="blogtypeModalTitle">Nieuw Blogtype</h2>
+      <div class="form-group">
+        <label>Naam *</label>
+        <input type="text" id="blogtypeNaam">
+        <div class="error-text" id="blogtypeNaamError" style="display: none;"></div>
+      </div>
+      <div class="form-group">
+        <label>Omschrijving</label>
+        <div class="editor-toolbar">
+          <button type="button" class="editor-btn" onclick="execCmdBlogtype('bold')" title="Vet"><b>B</b></button>
+          <button type="button" class="editor-btn" onclick="execCmdBlogtype('italic')" title="Cursief"><i>I</i></button>
+          <button type="button" class="editor-btn" onclick="execCmdBlogtype('underline')" title="Onderstreept"><u>U</u></button>
+          <button type="button" class="editor-btn" onclick="execCmdBlogtype('insertUnorderedList')" title="Lijst">&#8226;</button>
+        </div>
+        <div id="blogtypeOmschrijving" class="editor-content" contenteditable="true" style="min-height: 100px;"></div>
+      </div>
+      <div class="form-group">
+        <label>Afbeelding</label>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+          <input type="file" id="blogtypeImageFile" accept="image/*" onchange="handleBlogtypeImageUpload(this)">
+          <button type="button" class="btn btn-secondary" onclick="showImageLibraryForBlogtype()">Kies uit bibliotheek</button>
+        </div>
+        <div id="blogtypeImagePreview" style="display: none; margin-top: 10px;">
+          <img id="blogtypeImageImg" style="max-width: 100%; max-height: 150px; border-radius: 5px;">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelBlogtypeBtn">Annuleren</button>
+        <button class="btn btn-primary" id="saveBlogtypeBtn">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Library Modal -->
+  <div class="modal-overlay" id="imageLibraryModal">
+    <div class="modal" style="max-width: 600px;">
+      <h2>Afbeelding bibliotheek</h2>
+      <div style="margin-bottom: 15px;">
+        <input type="file" id="libraryImageFile" accept="image/*" onchange="handleLibraryImageUpload(this)">
+      </div>
+      <div id="imageLibraryGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-height: 400px; overflow-y: auto;">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeImageLibraryModal()">Sluiten</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Modal -->
+  <div class="modal-overlay" id="verificationModal">
+    <div class="modal">
+      <h2>Email verificatie</h2>
+      <p>Er is een verificatiecode verzonden naar <strong id="verifyEmail"></strong></p>
+      <p id="emailStatus" style="font-size: 12px; color: #666; margin-top: 5px;">Controleer je inbox (en spam)</p>
+      
+      <div id="verificationForm">
+        <div class="error-message" id="verificationError" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label>Voer verificatiecode in</label>
+          <input type="text" id="verifyCode" placeholder="6-cijferige code" style="text-align: center; letter-spacing: 5px; font-size: 18px;" maxlength="6">
+        </div>
+        
+        <div class="timer" id="timer">Nog 120 seconden</div>
+      </div>
+
+      <div class="success-message" id="verificationSuccess" style="display: none;">
+        Verificatie succesvol! Gebruiker wordt opgeslagen...
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelVerifyBtn">Annuleren</button>
+        <button class="btn btn-secondary" id="resendCodeBtn">Code opnieuw verzenden</button>
+        <button class="btn btn-primary" id="verifyBtn">Verifieer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <h2>Gebruiker verwijderen</h2>
+      <p>Weet u zeker dat u <strong id="deleteUserName"></strong> wilt verwijderen?</p>
+      <p style="color: #666; margin-top: 10px;">Deze actie kan niet ongedaan worden gemaakt.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Annuleren</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Ja, verwijderen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost/api.php';
+
+    // Data
+    let users = [];
+    let roles = [];
+    let blogs = [];
+    let contentTypes = [];
+    let currentUser = null;
+    
+    // State
+    let editingUserId = null;
+    let editingRoleId = null;
+    let editingBlogId = null;
+    let deleteUserId = null;
+    let pendingUser = null;
+    let verificationCode = null;
+    let timerInterval = null;
+    let timeLeft = 120;
+
+    // DOM Elements
+    const dashboardView = document.getElementById('dashboardView');
+    const usersView = document.getElementById('usersView');
+    const rolesView = document.getElementById('rolesView');
+    const blogsView = document.getElementById('blogsView');
+    const usersTab = document.getElementById('usersTab');
+    const rolesTab = document.getElementById('rolesTab');
+    const blogtypesTab = document.getElementById('blogtypesTab');
+    const blogpostsTab = document.getElementById('blogpostsTab');
+    const dashboardTab = document.getElementById('dashboardTab');
+    const blogtypesView = document.getElementById('blogtypesView');
+    const blogpostsView = document.getElementById('blogpostsView');
+    const userModal = document.getElementById('userModal');
+    const roleModal = document.getElementById('roleModal');
+    const verificationModal = document.getElementById('verificationModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const usersTableBody = document.getElementById('usersTableBody');
+    const noUsers = document.getElementById('noUsers');
+    const rolesList = document.getElementById('rolesList');
+
+    // Initialize
+    async function init() {
+      await checkSession();
+      setupEventListeners();
+      
+      // Initialize EmailJS
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+      }
+    }
+
+    async function checkSession() {
+      try {
+        const response = await fetch(API_URL + '?action=checkSession');
+        const data = await response.json();
+        
+        if (data.loggedIn) {
+          currentUser = data.user;
+          
+          if (currentUser.rol !== 'Beheerder') {
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          showMainContent();
+        } else {
+          window.location.href = 'index.html';
+        }
+      } catch (error) {
+        console.error('Fout bij checken session:', error);
+        window.location.href = 'index.html';
+      }
+    }
+
+    function showLoginSection() {
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('userInfo').style.display = 'none';
+    }
+
+    function showMainContent() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('userInfo').style.display = 'flex';
+      document.getElementById('loggedInUser').textContent = currentUser.naam + ' (' + currentUser.rol + ')';
+      
+      const profilePhotoEl = document.getElementById('userProfilePhoto');
+      if (currentUser.profielfoto) {
+        profilePhotoEl.src = currentUser.profielfoto;
+        profilePhotoEl.style.display = 'block';
+      } else {
+        profilePhotoEl.style.display = 'none';
+      }
+      
+      updateUIBasedOnRole();
+      
+      const isAdmin = currentUser.rol === 'Beheerder';
+      if (isAdmin) {
+        document.getElementById('dashboardTab').click();
+      } else {
+        document.getElementById('usersTab').click();
+      }
+      
+      loadRoles();
+      loadUsers();
+    }
+
+    async function loadUserStats() {
+      try {
+        const response = await fetch(API_URL + '?action=getUserStats');
+        const stats = await response.json();
+        
+        document.getElementById('totalUsers').textContent = stats.total || 0;
+        document.getElementById('pendingUsers').textContent = stats.pending || 0;
+        document.getElementById('activeUsers').textContent = stats.active || 0;
+        document.getElementById('blockedUsers').textContent = stats.blocked || 0;
+        
+        const typesRes = await fetch(API_URL + '?action=getContentTypes');
+        const blogTypes = await typesRes.json();
+        document.getElementById('totalBlogTypes').textContent = blogTypes.length || 0;
+        
+        const postsRes = await fetch(API_URL + '?action=getBlogs');
+        const blogPosts = await postsRes.json();
+        document.getElementById('totalBlogPosts').textContent = blogPosts.length || 0;
+        
+        loadPendingUsers();
+      } catch (error) {
+        console.error('Fout bij laden stats:', error);
+      }
+    }
+
+    async function loadPendingUsers() {
+      try {
+        const response = await fetch(API_URL + '?action=getPendingUsers');
+        const pendingUsers = await response.json();
+        renderPendingUsers(pendingUsers);
+      } catch (error) {
+        console.error('Fout bij laden pending users:', error);
+      }
+    }
+
+    function renderPendingUsers(pendingUsers) {
+      const container = document.getElementById('pendingUsersList');
+      const card = document.getElementById('pendingUsersCard');
+      
+      if (!pendingUsers || pendingUsers.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      card.style.display = 'block';
+      container.innerHTML = pendingUsers.map(user => `
+        <div class="pending-user-item">
+          <div class="pending-user-info">
+            <div class="pending-user-name">${user.voornaam} ${user.tussenvoegsel || ''} ${user.achternaam}</div>
+            <div class="pending-user-email">${user.emailadres}</div>
+            <div class="pending-user-date">Aangemeld op: ${new Date(user.created_at).toLocaleDateString('nl-NL')}</div>
+          </div>
+          <div class="pending-user-actions">
+            <select id="roleSelect_${user.id}" class="form-group" style="padding: 5px; margin-right: 10px;">
+              ${roles.map(r => `<option value="${r.naam}">${r.naam}</option>`).join('')}
+            </select>
+            <button class="btn btn-success btn-small" onclick="approveUser('${user.id}')">Goedkeuren</button>
+            <button class="btn btn-danger btn-small" onclick="rejectUser('${user.id}')">Afwijzen</button>
+            <button class="btn btn-secondary btn-small" onclick="blockUser('${user.id}')">Blokkeren</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function approveUser(id) {
+      const rol = document.getElementById('roleSelect_' + id)?.value || 'Gebruiker';
+      
+      try {
+        const response = await fetch(API_URL + '?action=approveUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, rol })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        alert('Gebruiker goedgekeurd!');
+        loadUserStats();
+        loadUsers();
+      } catch (error) {
+        console.error('Fout bij goedkeuren:', error);
+        alert('Fout bij goedkeuren gebruiker');
+      }
+    }
+
+    async function rejectUser(id) {
+      if (!confirm('Weet je zeker dat je deze gebruiker wilt afwijzen? De gebruiker wordt verwijderd.')) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=deleteUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        alert('Gebruiker afgewezen en verwijderd.');
+        loadUserStats();
+        loadUsers();
+      } catch (error) {
+        console.error('Fout bij afwijzen:', error);
+        alert('Fout bij afwijzen gebruiker');
+      }
+    }
+
+    async function blockUser(id) {
+      if (!confirm('Weet je zeker dat je deze gebruiker wilt blokkeren?')) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=blockUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        alert('Gebruiker geblokkeerd.');
+        loadUserStats();
+        loadUsers();
+      } catch (error) {
+        console.error('Fout bij blokkeren:', error);
+        alert('Fout bij blokkeren gebruiker');
+      }
+    }
+
+    function updateUIBasedOnRole() {
+      const isAdmin = currentUser.rol === 'Beheerder';
+      
+      document.getElementById('dashboardTab').style.display = isAdmin ? '' : 'none';
+      document.getElementById('rolesTab').style.display = isAdmin ? '' : 'none';
+      document.getElementById('blogtypesTab').style.display = isAdmin ? '' : 'none';
+      document.getElementById('blogpostsTab').style.display = isAdmin ? '' : 'none';
+      document.getElementById('newUserBtn').style.display = isAdmin ? '' : 'none';
+      document.getElementById('newBlogpostBtn').style.display = isAdmin ? '' : 'none';
+    }
+
+    async function loadUsers() {
+      try {
+        const response = await fetch(API_URL + '?action=getUsers');
+        users = await response.json();
+        renderUsers();
+      } catch (error) {
+        console.error('Fout bij laden gebruikers:', error);
+      }
+    }
+
+    async function loadRoles() {
+      try {
+        const [rolesRes, typesRes] = await Promise.all([
+          fetch(API_URL + '?action=getRoles'),
+          fetch(API_URL + '?action=getContentTypes')
+        ]);
+        roles = await rolesRes.json();
+        contentTypes = await typesRes.json();
+        populateRoleSelect();
+        renderRoles();
+      } catch (error) {
+        console.error('Fout bij laden rollen:', error);
+      }
+    }
+
+    async function loadBlogs() {
+      try {
+        const response = await fetch(API_URL + '?action=getBlogs');
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Fout:', data.error);
+          return;
+        }
+        
+        blogs = data;
+        renderBlogs();
+      } catch (error) {
+        console.error('Fout bij laden blogs:', error);
+      }
+    }
+
+    async function loadBlogposts() {
+      try {
+        const response = await fetch(API_URL + '?action=getBlogs');
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Fout:', data.error);
+          return;
+        }
+        
+        blogs = data;
+        renderBlogposts();
+      } catch (error) {
+        console.error('Fout bij laden blogposts:', error);
+      }
+    }
+
+    async function loadBlogtypes() {
+      try {
+        const response = await fetch(API_URL + '?action=getContentTypes');
+        blogTypes = await response.json();
+        
+        renderBlogtypes(blogTypes);
+      } catch (error) {
+        console.error('Fout bij laden blogtypes:', error);
+      }
+    }
+
+    function renderBlogtypes(types) {
+      const blogsList = document.getElementById('blogsList');
+      const noBlogs = document.getElementById('noBlogs');
+      
+      if (types.length === 0) {
+        blogsList.innerHTML = '';
+        noBlogs.style.display = 'block';
+        return;
+      }
+      
+      noBlogs.style.display = 'none';
+      blogsList.innerHTML = types.map(type => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = type.omschrijving || '';
+        const plainText = tempDiv.textContent || '';
+        const teaser = plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
+        const imageUrl = type.afbeelding || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'%3E%3Crect fill=\'%23ddd\' width=\'100\' height=\'100\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen%3C/text%3E%3C/svg%3E';
+        
+        return `
+          <div style="display: flex; gap: 20px; padding: 15px; border-bottom: 1px solid #dee2e6; align-items: center;">
+            <img src="${imageUrl}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\'%3E%3Crect fill=\'%23ddd\' width=\'80\' height=\'80\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen%3C/text%3E%3C/svg%3E'">
+            <div style="flex: 1;">
+              <h3 style="margin: 0 0 8px 0; color: #333;">${type.naam}</h3>
+              <p style="margin: 0; color: #666; font-size: 14px;">${teaser}</p>
+            </div>
+            <div style="flex-shrink: 0;">
+              <button class="btn btn-secondary btn-small" onclick="viewBlogtype(${type.id})">Bekijken</button>
+              <button class="btn btn-secondary btn-small" onclick="editBlogtype(${type.id})" style="margin-left: 5px;">Bewerken</button>
+              <button class="btn btn-danger btn-small" onclick="deleteBlogtype(${type.id})" style="margin-left: 5px;">Verwijderen</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewBlogtype(id) {
+      const type = blogTypes.find(t => t.id == id);
+      if (!type) return;
+      
+      let omschrijving = type.omschrijving || 'Geen omschrijving';
+      let afbeelding = type.afbeelding || 'Geen afbeelding';
+      
+      const message = `Naam: ${type.naam}\n\nOmschrijving: ${omschrijving}\n\nAfbeelding: ${afbeelding}`;
+      
+      alert(message);
+    }
+
+    function editBlogtype(id) {
+      const type = blogTypes.find(t => t.id == id);
+      if (!type) return;
+      
+      editingBlogtypeId = id;
+      document.getElementById('blogtypeModalTitle').textContent = 'Blogtype bewerken';
+      document.getElementById('blogtypeNaam').value = type.naam || '';
+      document.getElementById('blogtypeOmschrijving').innerHTML = type.omschrijving || '';
+      document.getElementById('blogtypeNaamError').style.display = 'none';
+      
+      if (type.afbeelding) {
+        blogtypeImageUrl = type.afbeelding;
+        document.getElementById('blogtypeImageImg').src = type.afbeelding;
+        document.getElementById('blogtypeImagePreview').style.display = 'block';
+      } else {
+        blogtypeImageUrl = null;
+        document.getElementById('blogtypeImageFile').value = '';
+        document.getElementById('blogtypeImagePreview').style.display = 'none';
+      }
+      
+      document.getElementById('blogtypeModal').style.display = 'flex';
+    }
+
+    async function deleteBlogtype(id) {
+      if (!confirm('Weet je zeker dat je dit blogtype wilt verwijderen? Alle bijbehorende blogposts worden ook verwijderd.')) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=deleteContentType', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        loadBlogtypes();
+      } catch (error) {
+        alert('Fout bij verwijderen blogtype');
+      }
+    }
+
+    let blogTypes = [];
+
+    function renderBlogposts() {
+      const blogpostsList = document.getElementById('blogpostsList');
+      const noBlogposts = document.getElementById('noBlogposts');
+      
+      if (blogs.length === 0) {
+        blogpostsList.innerHTML = '';
+        noBlogposts.style.display = 'block';
+        return;
+      }
+      
+      noBlogposts.style.display = 'none';
+      blogpostsList.innerHTML = blogs.map(blog => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = blog.omschrijving || '';
+        const plainText = tempDiv.textContent || '';
+        const truncated = plainText.substring(0, 150) + (plainText.length > 150 ? '...' : '');
+        
+        let tags = [];
+        if (blog.tags) {
+          try {
+            tags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
+          } catch (e) {}
+        }
+        
+        return `
+        <div class="blog-card">
+          <img class="blog-card-image" src="${blog.afbeelding || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'200\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen%3C/text%3E%3C/svg%3E'}" alt="${blog.titel}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'200\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen%3C/text%3E%3C/svg%3E'">
+          <div class="blog-card-content">
+            <div class="blog-card-title">${blog.titel}</div>
+            <div class="blog-card-description">${truncated}</div>
+            ${tags.length > 0 ? `<div class="blog-card-tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+            <div class="blog-card-meta">
+              ${blog.voornaam} ${blog.achternaam} - ${new Date(blog.created_at).toLocaleDateString('nl-NL')}
+            </div>
+            <div class="blog-card-actions">
+              <button class="btn btn-secondary btn-small" onclick="editBlog('${blog.id}')">Wijzig</button>
+              <button class="btn btn-danger btn-small" onclick="deleteBlog('${blog.id}')">Verwijder</button>
+            </div>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    async function loadBlogTypesForSelect() {
+      try {
+        const response = await fetch(API_URL + '?action=getContentTypes');
+        const types = await response.json();
+        
+        const response2 = await fetch(API_URL + '?action=getRoles');
+        const roles = await response2.json();
+        const userRole = roles.find(r => r.naam === currentUser.rol);
+        const userPermissions = userRole ? (userRole.permissions || {}) : {};
+        
+        const allowedTypes = types.filter(t => {
+          const perms = userPermissions[t.id] || {};
+          return perms.create || perms.edit;
+        });
+        
+        const select = document.getElementById('blogTypeSelect');
+        select.innerHTML = allowedTypes.map(t => `<option value="${t.id}">${t.naam}</option>`).join('');
+        
+        if (allowedTypes.length === 0) {
+          select.innerHTML = '<option value="">Geen types beschikbaar</option>';
+        }
+      } catch (error) {
+        console.error('Fout bij laden blog types:', error);
+      }
+    }
+
+    async function showImageLibrary() {
+      try {
+        const response = await fetch(API_URL + '?action=getUserImages');
+        const images = await response.json();
+        
+        const grid = document.getElementById('imageLibraryGrid');
+        if (images.length === 0) {
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">Nog geen afbeeldingen geüpload.</p>';
+        } else {
+          grid.innerHTML = images.map(img => `
+            <div style="cursor: pointer; border: 2px solid #ddd; border-radius: 5px; overflow: hidden;" onclick="selectImageFromLibrary('${img.url}')">
+              <img src="${img.url}" style="width: 100%; height: 100px; object-fit: cover;">
+            </div>
+          `).join('');
+        }
+        
+        document.getElementById('imageLibraryModal').style.display = 'flex';
+      } catch (error) {
+        console.error('Fout bij laden bibliotheek:', error);
+      }
+    }
+
+    function closeImageLibraryModal() {
+      document.getElementById('imageLibraryModal').style.display = 'none';
+    }
+
+    function selectImageFromLibrary(url) {
+      if (selectingForBlogtype) {
+        selectingForBlogtype = false;
+        blogtypeImageUrl = url;
+        document.getElementById('blogtypeImageImg').src = url;
+        document.getElementById('blogtypeImagePreview').style.display = 'block';
+      } else {
+        uploadedImageUrl = url;
+        document.getElementById('uploadedImagePreview').src = url;
+        document.getElementById('imageUploadPreview').style.display = 'block';
+      }
+      closeImageLibraryModal();
+    }
+
+    async function handleLibraryImageUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const response = await fetch(API_URL + '?action=uploadImage', { method: 'POST', body: formData });
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        if (data.url) {
+          showImageLibrary();
+        }
+      } catch (error) {
+        alert('Fout bij uploaden');
+      }
+    }
+
+    function renderBlogs() {
+      const blogsList = document.getElementById('blogsList');
+      const noBlogs = document.getElementById('noBlogs');
+      
+      if (blogs.length === 0) {
+        blogsList.innerHTML = '';
+        noBlogs.style.display = 'block';
+        return;
+      }
+      
+      noBlogs.style.display = 'none';
+      blogsList.innerHTML = blogs.map(blog => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = blog.omschrijving || '';
+        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+        const truncated = plainText.substring(0, 150) + (plainText.length > 150 ? '...' : '');
+        
+        return `
+        <div class="blog-card">
+          <img class="blog-card-image" src="${blog.afbeelding || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'200\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen afbeelding%3C/text%3E%3C/svg%3E'}" alt="${blog.titel}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'200\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EGeen afbeelding%3C/text%3E%3C/svg%3E'">
+          <div class="blog-card-content">
+            <div class="blog-card-title">${blog.titel}</div>
+            <div class="blog-card-description">${truncated}</div>
+            <div class="blog-card-meta">
+              ${blog.voornaam} ${blog.achternaam} - ${new Date(blog.created_at).toLocaleDateString('nl-NL')}
+            </div>
+            <div class="blog-card-actions">
+              <button class="btn btn-secondary btn-small" onclick="editBlog('${blog.id}')">Wijzig</button>
+              <button class="btn btn-danger btn-small" onclick="deleteBlog('${blog.id}')">Verwijder</button>
+            </div>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    function openNewBlogModal() {
+      editingBlogId = null;
+      uploadedImageUrl = null;
+      document.getElementById('blogModalTitle').textContent = 'Nieuwe blogpost';
+      document.getElementById('blogTitel').value = '';
+      document.getElementById('blogTags').value = '';
+      document.getElementById('blogOmschrijving').innerHTML = '';
+      document.getElementById('blogImageFile').value = '';
+      document.getElementById('blogImageFile').style.display = 'block';
+      document.getElementById('imageUploadPreview').style.display = 'none';
+      document.getElementById('blogTitelError').style.display = 'none';
+      document.getElementById('blogOmschrijvingError').style.display = 'none';
+      document.getElementById('blogAfbeeldingError').style.display = 'none';
+      document.getElementById('saveBlogBtn').textContent = 'Blogpost opslaan';
+      document.getElementById('blogModal').classList.add('active');
+      
+      loadBlogTypesForSelect();
+    }
+
+    let editingBlogtypeId = null;
+    let blogtypeImageUrl = null;
+    let selectingForBlogtype = false;
+
+    function openNewBlogtypeModal() {
+      editingBlogtypeId = null;
+      blogtypeImageUrl = null;
+      document.getElementById('blogtypeModalTitle').textContent = 'Nieuw Blogtype';
+      document.getElementById('blogtypeNaam').value = '';
+      document.getElementById('blogtypeOmschrijving').innerHTML = '';
+      document.getElementById('blogtypeImageFile').value = '';
+      document.getElementById('blogtypeImagePreview').style.display = 'none';
+      document.getElementById('blogtypeNaamError').style.display = 'none';
+      document.getElementById('blogtypeModal').style.display = 'flex';
+    }
+
+    function closeBlogtypeModal() {
+      document.getElementById('blogtypeModal').style.display = 'none';
+      editingBlogtypeId = null;
+      blogtypeImageUrl = null;
+      document.getElementById('blogtypeNaam').value = '';
+      document.getElementById('blogtypeOmschrijving').innerHTML = '';
+      document.getElementById('blogtypeImageFile').value = '';
+      document.getElementById('blogtypeImagePreview').style.display = 'none';
+      document.getElementById('blogtypeModalTitle').textContent = 'Nieuw Blogtype';
+    }
+
+    function execCmdBlogtype(command) {
+      document.execCommand(command, false, null);
+      document.getElementById('blogtypeOmschrijving').focus();
+    }
+
+    async function showImageLibraryForBlogtype() {
+      alert('showImageLibraryForBlogtype called');
+      selectingForBlogtype = true;
+      await showImageLibrary();
+    }
+
+    async function handleBlogtypeImageUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const response = await fetch(API_URL + '?action=uploadImage', { method: 'POST', body: formData });
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        if (data.url) {
+          blogtypeImageUrl = data.url;
+          document.getElementById('blogtypeImageImg').src = data.url;
+          document.getElementById('blogtypeImagePreview').style.display = 'block';
+        }
+      } catch (error) {
+        alert('Fout bij uploaden');
+      }
+    }
+
+    async function saveBlogtype() {
+      alert('saveBlogtype called, editingBlogtypeId: ' + editingBlogtypeId);
+      const naam = document.getElementById('blogtypeNaam').value.trim();
+      const omschrijving = document.getElementById('blogtypeOmschrijving').innerHTML;
+      const afbeelding = blogtypeImageUrl;
+      alert('Saving: ' + JSON.stringify({ naam, omschrijving, afbeelding, editingBlogtypeId }));
+      
+      if (!naam) {
+        document.getElementById('blogtypeNaamError').textContent = 'Naam is verplicht';
+        document.getElementById('blogtypeNaamError').style.display = 'block';
+        return;
+      }
+      
+      try {
+        let action = 'addContentType';
+        let body = { naam, omschrijving, afbeelding };
+        
+        if (editingBlogtypeId) {
+          action = 'updateContentType';
+          body = { id: editingBlogtypeId, naam, omschrijving, afbeelding };
+        }
+        
+        const response = await fetch(API_URL + '?action=' + action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        closeBlogtypeModal();
+        loadBlogtypes();
+      } catch (error) {
+        alert('Fout bij opslaan blogtype');
+      }
+    }
+
+    function editBlog(id) {
+      const blog = blogs.find(b => b.id == id);
+      if (!blog) return;
+
+      editingBlogId = id;
+      uploadedImageUrl = blog.afbeelding;
+      document.getElementById('blogModalTitle').textContent = 'Blogpost wijzigen';
+      document.getElementById('blogTitel').value = blog.titel;
+      document.getElementById('blogOmschrijving').innerHTML = blog.omschrijving || '';
+      
+      let tags = [];
+      if (blog.tags) {
+        try {
+          tags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
+        } catch (e) {}
+      }
+      document.getElementById('blogTags').value = tags.join(', ');
+      
+      loadBlogTypesForSelect();
+      setTimeout(() => {
+        document.getElementById('blogTypeSelect').value = blog.content_type_id;
+      }, 100);
+      
+      if (blog.afbeelding) {
+        document.getElementById('blogImageFile').style.display = 'none';
+        document.getElementById('uploadedImagePreview').src = blog.afbeelding;
+        document.getElementById('imageUploadPreview').style.display = 'block';
+      } else {
+        document.getElementById('blogImageFile').value = '';
+        document.getElementById('blogImageFile').style.display = 'block';
+        document.getElementById('imageUploadPreview').style.display = 'none';
+      }
+      
+      document.getElementById('blogTitelError').style.display = 'none';
+      document.getElementById('blogOmschrijvingError').style.display = 'none';
+      document.getElementById('blogAfbeeldingError').style.display = 'none';
+      document.getElementById('saveBlogBtn').textContent = 'Wijzigingen opslaan';
+      document.getElementById('blogModal').classList.add('active');
+    }
+
+    function editBlog(id) {
+      const blog = blogs.find(b => b.id == id);
+      if (!blog) return;
+
+      editingBlogId = id;
+      document.getElementById('blogModalTitle').textContent = 'Blog wijzigen';
+      document.getElementById('blogTitel').value = blog.titel;
+      document.getElementById('blogOmschrijving').innerHTML = blog.omschrijving || '';
+      
+      if (blog.afbeelding) {
+        document.getElementById('blogImageFile').style.display = 'none';
+        document.getElementById('uploadedImagePreview').src = blog.afbeelding;
+        document.getElementById('imageUploadPreview').style.display = 'block';
+      } else {
+        document.getElementById('blogImageFile').value = '';
+        document.getElementById('blogImageFile').style.display = 'block';
+        document.getElementById('imageUploadPreview').style.display = 'none';
+      }
+      
+      document.getElementById('blogTitelError').style.display = 'none';
+      document.getElementById('blogOmschrijvingError').style.display = 'none';
+      document.getElementById('blogAfbeeldingError').style.display = 'none';
+      document.getElementById('saveBlogBtn').textContent = 'Wijzigingen opslaan';
+      document.getElementById('blogModal').classList.add('active');
+    }
+
+    function closeBlogModal() {
+      document.getElementById('blogModal').classList.remove('active');
+      editingBlogId = null;
+    }
+
+    let uploadedImageUrl = null;
+    let profilePhotoUrl = null;
+
+    async function handleProfilePhotoUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const response = await fetch(API_URL + '?action=uploadImage', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        if (data.url) {
+          profilePhotoUrl = data.url;
+          document.getElementById('profilePhotoImg').src = data.url;
+          document.getElementById('profilePhotoPreview').style.display = 'block';
+          input.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Upload fout:', error);
+        alert('Fout bij uploaden profielfoto');
+      }
+    }
+
+    function removeProfilePhoto() {
+      profilePhotoUrl = null;
+      document.getElementById('regProfilePhoto').value = '';
+      document.getElementById('regProfilePhoto').style.display = 'block';
+      document.getElementById('profilePhotoPreview').style.display = 'none';
+    }
+
+    function execCmd(command) {
+      document.execCommand(command, false, null);
+      document.getElementById('blogOmschrijving').focus();
+    }
+
+    function insertImage() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        try {
+          const response = await fetch(API_URL + '?action=uploadImage', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+          
+          if (data.url) {
+            const img = document.createElement('img');
+            img.src = data.url;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            document.getElementById('blogOmschrijving').appendChild(img);
+          }
+        } catch (error) {
+          console.error('Upload fout:', error);
+          alert('Fout bij uploaden afbeelding');
+        }
+      };
+      input.click();
+    }
+
+    async function handleImageUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const response = await fetch(API_URL + '?action=uploadImage', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        if (data.url) {
+          uploadedImageUrl = data.url;
+          
+          const img = new Image();
+          img.onload = function() {
+            if (this.naturalWidth < 900 || this.naturalHeight < 300) {
+              document.getElementById('blogAfbeeldingError').textContent = `Afbeelding is ${this.naturalWidth}x${this.naturalHeight}. Minimaal 900x300 vereist.`;
+              document.getElementById('blogAfbeeldingError').style.display = 'block';
+              uploadedImageUrl = null;
+            } else {
+              document.getElementById('blogAfbeeldingError').style.display = 'none';
+              document.getElementById('uploadedImagePreview').src = data.url;
+              document.getElementById('imageUploadPreview').style.display = 'block';
+              input.style.display = 'none';
+            }
+          };
+          img.onerror = function() {
+            document.getElementById('blogAfbeeldingError').textContent = 'Ongeldige afbeelding';
+            document.getElementById('blogAfbeeldingError').style.display = 'block';
+          };
+          img.src = data.url;
+        }
+      } catch (error) {
+        console.error('Upload fout:', error);
+        alert('Fout bij uploaden afbeelding');
+      }
+    }
+
+    function removeUploadedImage() {
+      uploadedImageUrl = null;
+      document.getElementById('blogImageFile').value = '';
+      document.getElementById('blogImageFile').style.display = 'block';
+      document.getElementById('imageUploadPreview').style.display = 'none';
+      document.getElementById('blogAfbeeldingError').style.display = 'none';
+    }
+
+    async function saveBlog() {
+      const titel = document.getElementById('blogTitel').value.trim();
+      const omschrijving = document.getElementById('blogOmschrijving').innerHTML;
+      const blogtype_id = document.getElementById('blogTypeSelect').value;
+      const tagsInput = document.getElementById('blogTags').value.trim();
+      const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+      const afbeelding = uploadedImageUrl;
+      
+      let hasError = false;
+      
+      if (!titel) {
+        document.getElementById('blogTitelError').textContent = 'Titel is verplicht';
+        document.getElementById('blogTitelError').style.display = 'block';
+        hasError = true;
+      } else {
+        document.getElementById('blogTitelError').style.display = 'none';
+      }
+      
+      if (!blogtype_id) {
+        hasError = true;
+      }
+      
+      if (!omschrijving || omschrijving === '<br>') {
+        document.getElementById('blogOmschrijvingError').textContent = 'Tekst is verplicht';
+        document.getElementById('blogOmschrijvingError').style.display = 'block';
+        hasError = true;
+      } else {
+        document.getElementById('blogOmschrijvingError').style.display = 'none';
+      }
+      
+      if (!afbeelding) {
+        document.getElementById('blogAfbeeldingError').textContent = 'Afbeelding is verplicht';
+        document.getElementById('blogAfbeeldingError').style.display = 'block';
+        hasError = true;
+      } else {
+        document.getElementById('blogAfbeeldingError').style.display = 'none';
+      }
+      
+      if (hasError) return;
+      
+      try {
+        const action = editingBlogId ? 'updateBlog' : 'addBlog';
+        const body = editingBlogId 
+          ? { id: editingBlogId, titel, omschrijving, blogtype_id, tags, afbeelding }
+          : { titel, omschrijving, blogtype_id, tags, afbeelding };
+        
+        const response = await fetch(API_URL + '?action=' + action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        closeBlogModal();
+        await loadBlogposts();
+      } catch (error) {
+        console.error('Fout bij opslaan blogpost:', error);
+        alert('Fout bij opslaan blogpost');
+      }
+    }
+
+    async function deleteBlog(id) {
+      if (!confirm('Weet je zeker dat je deze blogpost wilt verwijderen?')) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=deleteBlog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        await loadBlogposts();
+      } catch (error) {
+        console.error('Fout bij verwijderen blogpost:', error);
+        alert('Fout bij verwijderen blogpost');
+      }
+    }
+
+    async function doLogin() {
+      const emailadres = document.getElementById('loginEmail').value.trim();
+      const code = document.getElementById('loginCode')?.value.trim();
+      const errorEl = document.getElementById('loginError');
+      const sendCodeBtn = document.getElementById('sendCodeBtn');
+      const sendCodeBtnText = document.getElementById('sendCodeBtnText');
+      const sendCodeBtnSpinner = document.getElementById('sendCodeBtnSpinner');
+      const loginBtn = document.getElementById('loginBtn');
+      
+      errorEl.style.display = 'none';
+      
+      if (!emailadres) {
+        errorEl.textContent = 'Vul je emailadres in';
+        errorEl.style.display = 'block';
+        return;
+      }
+      
+      // Toon loading state
+      sendCodeBtn.disabled = true;
+      if (sendCodeBtnText) sendCodeBtnText.textContent = 'Verificatiecode wordt nu voor je gegenereerd...';
+      if (sendCodeBtnSpinner) sendCodeBtnSpinner.style.display = 'inline-block';
+      
+      try {
+        const response = await fetch(API_URL + '?action=login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailadres, code })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          errorEl.textContent = data.error;
+          errorEl.style.display = 'block';
+          sendCodeBtn.disabled = false;
+          if (sendCodeBtnText) sendCodeBtnText.textContent = 'Verstuur verificatiecode';
+          if (sendCodeBtnSpinner) sendCodeBtnSpinner.style.display = 'none';
+        } else if (data.send_email) {
+          // Verstuur verificatiecode via emailJS
+          if (typeof emailjs !== 'undefined') {
+            await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.loginTemplateId, {
+              to_name: data.voornaam || 'Gebruiker',
+              to_email: data.email,
+              verification_code: data.code,
+              expiry_time: '10 minuten'
+            });
+          }
+          
+          // Toon verificatiecode invoer
+          document.getElementById('loginCodeGroup').style.display = 'block';
+          document.getElementById('sendCodeBtn').style.display = 'none';
+          document.getElementById('loginBtn').style.display = 'block';
+          document.getElementById('loginCode').focus();
+          errorEl.textContent = 'Er is een verificatiecode verstuurd naar je email';
+          errorEl.style.display = 'block';
+        } else if (data.success) {
+          currentUser = data.user;
+          showMainContent();
+          document.getElementById('loginEmail').value = '';
+          document.getElementById('loginCode').value = '';
+          document.getElementById('loginCodeGroup').style.display = 'none';
+          sendCodeBtn.style.display = 'block';
+          sendCodeBtn.disabled = false;
+          if (sendCodeBtnText) sendCodeBtnText.textContent = 'Verstuur verificatiecode';
+          if (sendCodeBtnSpinner) sendCodeBtnSpinner.style.display = 'none';
+          document.getElementById('loginBtn').style.display = 'none';
+        }
+      } catch (error) {
+        errorEl.textContent = 'Verbindingsfout';
+        errorEl.style.display = 'block';
+        sendCodeBtn.disabled = false;
+        if (sendCodeBtnText) sendCodeBtnText.textContent = 'Verstuur verificatiecode';
+        if (sendCodeBtnSpinner) sendCodeBtnSpinner.style.display = 'none';
+      }
+    }
+
+    async function checkEmailExists() {
+      const emailadres = document.getElementById('regEmailadres').value.trim();
+      const errorEl = document.getElementById('registerError');
+      
+      if (!emailadres) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=checkEmail&email=' + encodeURIComponent(emailadres));
+        const data = await response.json();
+        
+        if (data.exists) {
+          errorEl.textContent = 'Emailadres al in gebruik';
+          errorEl.style.display = 'block';
+          document.getElementById('regEmailadres').classList.add('input-error');
+        } else {
+          document.getElementById('regEmailadres').classList.remove('input-error');
+          if (errorEl.textContent === 'Emailadres al in gebruik') {
+            errorEl.style.display = 'none';
+          }
+        }
+      } catch (error) {
+        console.error('Fout bij controleren email:', error);
+      }
+    }
+
+    async function checkNameExists() {
+      const voornaam = document.getElementById('regVoornaam').value.trim();
+      const tussenvoegsel = document.getElementById('regTussenvoegsel').value.trim();
+      const achternaam = document.getElementById('regAchternaam').value.trim();
+      const errorEl = document.getElementById('registerError');
+      
+      if (!voornaam || !achternaam) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=checkName&voornaam=' + encodeURIComponent(voornaam) + '&tussenvoegsel=' + encodeURIComponent(tussenvoegsel) + '&achternaam=' + encodeURIComponent(achternaam));
+        const data = await response.json();
+        
+        if (data.exists) {
+          errorEl.textContent = 'Deze gebruiker bestaat al';
+          errorEl.style.display = 'block';
+          document.getElementById('regVoornaam').classList.add('input-error');
+          document.getElementById('regAchternaam').classList.add('input-error');
+        } else {
+          document.getElementById('regVoornaam').classList.remove('input-error');
+          document.getElementById('regAchternaam').classList.remove('input-error');
+          if (errorEl.textContent === 'Deze gebruiker bestaat al') {
+            errorEl.style.display = 'none';
+          }
+        }
+      } catch (error) {
+        console.error('Fout bij controleren naam:', error);
+      }
+    }
+
+    async function doRegister() {
+      const voornaam = document.getElementById('regVoornaam').value.trim();
+      const tussenvoegsel = document.getElementById('regTussenvoegsel').value.trim();
+      const achternaam = document.getElementById('regAchternaam').value.trim();
+      const emailadres = document.getElementById('regEmailadres').value.trim();
+      const errorEl = document.getElementById('registerError');
+      const successEl = document.getElementById('registerSuccess');
+      
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+      
+      if (!voornaam || !achternaam || !emailadres) {
+        errorEl.textContent = 'Alle velden zijn verplicht';
+        errorEl.style.display = 'block';
+        return;
+      }
+      
+      try {
+        const response = await fetch(API_URL + '?action=register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ voornaam, tussenvoegsel, achternaam, emailadres, profielfoto: profilePhotoUrl })
+        });
+        
+        const data = await response.json();
+        
+        console.log('Register response:', data);
+        
+        if (data.error) {
+          errorEl.textContent = data.error;
+          errorEl.style.display = 'block';
+          return;
+        } else if (data.success) {
+          successEl.textContent = data.message || 'Account aangemaakt! Je kunt nu inloggen.';
+          successEl.style.display = 'block';
+          document.getElementById('regVoornaam').value = '';
+          document.getElementById('regTussenvoegsel').value = '';
+          document.getElementById('regAchternaam').value = '';
+          document.getElementById('regEmailadres').value = '';
+          removeProfilePhoto();
+          
+          setTimeout(() => {
+            document.getElementById('loginTab').click();
+            successEl.style.display = 'none';
+          }, 2000);
+          return;
+        }
+      } catch (error) {
+        errorEl.textContent = 'Verbindingsfout';
+        errorEl.style.display = 'block';
+        return;
+      }
+    }
+
+    async function doLogout() {
+      try {
+        await fetch(API_URL + '?action=logout');
+        currentUser = null;
+        showLoginSection();
+      } catch (error) {
+        console.error('Fout bij uitloggen:', error);
+      }
+    }
+
+    function setupEventListeners() {
+      // Login/Register tabs
+      document.getElementById('loginTab').addEventListener('click', () => {
+        document.getElementById('loginTab').classList.add('active');
+        document.getElementById('registerTab').classList.remove('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+      });
+
+      document.getElementById('registerTab').addEventListener('click', () => {
+        document.getElementById('registerTab').classList.add('active');
+        document.getElementById('loginTab').classList.remove('active');
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+      });
+
+      // Login
+      document.getElementById('sendCodeBtn').addEventListener('click', doLogin);
+      document.getElementById('loginBtn').addEventListener('click', doLogin);
+      document.getElementById('loginEmail').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') doLogin();
+      });
+      const loginCodeEl = document.getElementById('loginCode');
+      if (loginCodeEl) {
+        loginCodeEl.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') doLogin();
+        });
+      }
+
+      // Register with real-time validation
+      document.getElementById('regEmailadres').addEventListener('blur', checkEmailExists);
+      document.getElementById('regVoornaam').addEventListener('blur', checkNameExists);
+      document.getElementById('regTussenvoegsel').addEventListener('blur', checkNameExists);
+      document.getElementById('regAchternaam').addEventListener('blur', checkNameExists);
+      document.getElementById('registerBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        doRegister();
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+      // Tab switching
+      dashboardTab.addEventListener('click', () => {
+        dashboardTab.classList.add('active');
+        usersTab.classList.remove('active');
+        rolesTab.classList.remove('active');
+        blogtypesTab.classList.remove('active');
+        blogpostsTab.classList.remove('active');
+        dashboardView.style.display = 'block';
+        usersView.style.display = 'none';
+        rolesView.style.display = 'none';
+        blogtypesView.style.display = 'none';
+        blogpostsView.style.display = 'none';
+        loadUserStats();
+      });
+
+      usersTab.addEventListener('click', () => {
+        usersTab.classList.add('active');
+        dashboardTab.classList.remove('active');
+        rolesTab.classList.remove('active');
+        blogtypesTab.classList.remove('active');
+        blogpostsTab.classList.remove('active');
+        usersView.style.display = 'block';
+        dashboardView.style.display = 'none';
+        rolesView.style.display = 'none';
+        blogtypesView.style.display = 'none';
+        blogpostsView.style.display = 'none';
+        currentPage = 1;
+        loadUsers();
+        loadPendingUsers();
+      });
+
+      document.getElementById('userSearchInput').addEventListener('input', (e) => {
+        currentPage = 1;
+        const searchTerm = e.target.value.toLowerCase();
+        if (searchTerm) {
+          const filtered = users.filter(u => 
+            (u.voornaam + ' ' + (u.tussenvoegsel || '') + ' ' + u.achternaam).toLowerCase().includes(searchTerm) ||
+            u.emailadres.toLowerCase().includes(searchTerm) ||
+            u.rol.toLowerCase().includes(searchTerm)
+          );
+          renderUsers(filtered);
+        } else {
+          renderUsers();
+        }
+      });
+
+      rolesTab.addEventListener('click', () => {
+        rolesTab.classList.add('active');
+        dashboardTab.classList.remove('active');
+        usersTab.classList.remove('active');
+        blogtypesTab.classList.remove('active');
+        blogpostsTab.classList.remove('active');
+        rolesView.style.display = 'block';
+        dashboardView.style.display = 'none';
+        usersView.style.display = 'none';
+        blogtypesView.style.display = 'none';
+        blogpostsView.style.display = 'none';
+      });
+
+      blogtypesTab.addEventListener('click', async () => {
+        blogtypesTab.classList.add('active');
+        dashboardTab.classList.remove('active');
+        usersTab.classList.remove('active');
+        rolesTab.classList.remove('active');
+        blogpostsTab.classList.remove('active');
+        blogtypesView.style.display = 'block';
+        dashboardView.style.display = 'none';
+        usersView.style.display = 'none';
+        rolesView.style.display = 'none';
+        blogpostsView.style.display = 'none';
+        await loadBlogtypes();
+      });
+
+      blogpostsTab.addEventListener('click', async () => {
+        blogpostsTab.classList.add('active');
+        dashboardTab.classList.remove('active');
+        usersTab.classList.remove('active');
+        rolesTab.classList.remove('active');
+        blogtypesTab.classList.remove('active');
+        blogpostsView.style.display = 'block';
+        dashboardView.style.display = 'none';
+        usersView.style.display = 'none';
+        rolesView.style.display = 'none';
+        blogtypesView.style.display = 'none';
+        await loadBlogposts();
+      });
+
+      // Pending card click
+      document.getElementById('pendingCard').addEventListener('click', () => {
+        dashboardTab.click();
+      });
+
+      // User modal
+      document.getElementById('newUserBtn').addEventListener('click', openNewUserModal);
+      document.getElementById('cancelUserBtn').addEventListener('click', closeUserModal);
+      document.getElementById('saveUserBtn').addEventListener('click', saveUser);
+
+      // Role modal
+      document.getElementById('newRoleBtn').addEventListener('click', openNewRoleModal);
+      document.getElementById('cancelRoleBtn').addEventListener('click', closeRoleModal);
+      document.getElementById('saveRoleBtn').addEventListener('click', saveRole);
+
+      // Blogpost modal
+      document.getElementById('newBlogpostBtn').addEventListener('click', openNewBlogModal);
+      document.getElementById('cancelBlogBtn').addEventListener('click', closeBlogModal);
+      document.getElementById('saveBlogBtn').addEventListener('click', saveBlog);
+
+      // Blogtype modal
+      document.getElementById('newBlogtypeBtn').addEventListener('click', openNewBlogtypeModal);
+      document.getElementById('cancelBlogtypeBtn').addEventListener('click', closeBlogtypeModal);
+      document.getElementById('saveBlogtypeBtn').addEventListener('click', saveBlogtype);
+
+      // Verification modal
+      document.getElementById('cancelVerifyBtn').addEventListener('click', closeVerificationModal);
+      document.getElementById('verifyBtn').addEventListener('click', verifyCode);
+      document.getElementById('resendCodeBtn').addEventListener('click', resendCode);
+
+      // Delete modal
+      document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+      document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+      // Verify code input
+      document.getElementById('verifyCode').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+      });
+    }
+
+    function populateRoleSelect() {
+      const select = document.getElementById('rolSelect');
+      select.innerHTML = roles.map(r => `<option value="${r.naam}">${r.naam}</option>`).join('');
+    }
+
+    let currentPage = 1;
+    const usersPerPage = 10;
+
+    function renderUsers(filteredUsers = null) {
+      const displayUsers = filteredUsers || users;
+      
+      if (displayUsers.length === 0) {
+        usersTableBody.innerHTML = '';
+        noUsers.style.display = 'block';
+        document.getElementById('paginationControls').innerHTML = '';
+        return;
+      }
+
+      noUsers.style.display = 'none';
+      
+      const totalPages = Math.ceil(displayUsers.length / usersPerPage);
+      const start = (currentPage - 1) * usersPerPage;
+      const end = start + usersPerPage;
+      const pageUsers = displayUsers.slice(start, end);
+
+      usersTableBody.innerHTML = pageUsers.map(user => {
+        const statusLabels = {
+          'pending': '<span style="color: #ffc107;">In afwachting</span>',
+          'active': '<span style="color: #28a745;">Actief</span>',
+          'blocked': '<span style="color: #dc3545;">Geblokkeerd</span>'
+        };
+        const status = user.status || 'active';
+        const isBlocked = status === 'blocked';
+        
+        return `
+        <tr>
+          <td>${user.profielfoto ? `<img src="${user.profielfoto}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-right: 10px; vertical-align: middle;">` : ''}${user.voornaam} ${user.tussenvoegsel || ''} ${user.achternaam}</td>
+          <td>${user.emailadres}</td>
+          <td>${user.rol}</td>
+          <td>${statusLabels[status] || status}</td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editUser('${user.id}')">Wijzig</button>
+            <button class="btn ${isBlocked ? 'btn-success' : 'btn-danger'} btn-small" onclick="${isBlocked ? 'unblockUser' : 'blockUser'}('${user.id}')" style="margin-left: 5px;">${isBlocked ? 'Deblokkeren' : 'Blokkeren'}</button>
+            <button class="btn btn-danger btn-small" onclick="deleteUser('${user.id}')" style="margin-left: 5px;">Verwijder</button>
+          </td>
+        </tr>
+      `}).join('');
+
+      // Pagination controls
+      let paginationHtml = '';
+      if (totalPages > 1) {
+        paginationHtml += `<button class="btn btn-secondary btn-small" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Vorige</button>`;
+        paginationHtml += ` <span style="padding: 8px;">${currentPage} / ${totalPages}</span> `;
+        paginationHtml += `<button class="btn btn-secondary btn-small" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Volgende</button>`;
+      }
+      document.getElementById('paginationControls').innerHTML = paginationHtml;
+    }
+
+    function changePage(page) {
+      const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+      if (searchTerm) {
+        const filtered = users.filter(u => 
+          (u.voornaam + ' ' + (u.tussenvoegsel || '') + ' ' + u.achternaam).toLowerCase().includes(searchTerm) ||
+          u.emailadres.toLowerCase().includes(searchTerm) ||
+          u.rol.toLowerCase().includes(searchTerm)
+        );
+        const totalPages = Math.ceil(filtered.length / usersPerPage);
+        if (page > totalPages) page = totalPages;
+        if (page < 1) page = 1;
+        currentPage = page;
+        renderUsers(filtered);
+      } else {
+        const totalPages = Math.ceil(users.length / usersPerPage);
+        if (page > totalPages) page = totalPages;
+        if (page < 1) page = 1;
+        currentPage = page;
+        renderUsers();
+      }
+    }
+
+    async function unblockUser(id) {
+      if (!confirm('Weet je zeker dat je deze gebruiker wilt deblokkeren?')) return;
+      
+      try {
+        const response = await fetch(API_URL + '?action=unblockUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        alert('Gebruiker gedeblokkeerd.');
+        loadUsers();
+      } catch (error) {
+        console.error('Fout bij deblokkeren:', error);
+        alert('Fout bij deblokkeren gebruiker');
+      }
+    }
+
+    function renderRoles() {
+      rolesList.innerHTML = roles.map(role => {
+        const rolePerms = role.permissions || {};
+        const permStrings = [];
+        
+        contentTypes.forEach(type => {
+          const perms = rolePerms[type.id];
+          if (perms) {
+            const typePerms = [];
+            if (perms.read) typePerms.push('Lezen');
+            if (perms.create) typePerms.push('Aanmaken');
+            if (perms.edit) typePerms.push('Bewerken');
+            if (perms.delete) typePerms.push('Verwijderen');
+            
+            if (typePerms.length > 0) {
+              permStrings.push(`${type.naam}: ${typePerms.join(', ')}`);
+            }
+          }
+        });
+        
+        return `
+        <li class="role-item">
+          <div>
+            <span class="role-name">${role.naam}</span>
+            <span class="role-permissions">${permStrings.length > 0 ? permStrings.join(' | ') : 'Geen rechten'}</span>
+          </div>
+          <div class="role-actions">
+            <button class="btn btn-secondary btn-small" onclick="editRole('${role.id}')">Wijzig</button>
+            <button class="btn btn-danger btn-small" onclick="deleteRole('${role.id}')" style="margin-left: 5px;">Verwijder</button>
+          </div>
+        </li>
+      `}).join('');
+    }
+
+    // User functions
+    function openNewUserModal() {
+      editingUserId = null;
+      document.getElementById('userModalTitle').textContent = 'Nieuwe gebruiker';
+      document.getElementById('voornaam').value = '';
+      document.getElementById('tussenvoegsel').value = '';
+      document.getElementById('achternaam').value = '';
+      document.getElementById('emailadres').value = '';
+      document.getElementById('userEmailError').style.display = 'none';
+      populateRoleSelect();
+      document.getElementById('saveUserBtn').textContent = 'Gebruiker aanmaken';
+      userModal.classList.add('active');
+    }
+
+    function editUser(id) {
+      const user = users.find(u => u.id == id);
+      if (!user) return;
+
+      editingUserId = id;
+      document.getElementById('userModalTitle').textContent = 'Gebruiker wijzigen';
+      document.getElementById('voornaam').value = user.voornaam;
+      document.getElementById('tussenvoegsel').value = user.tussenvoegsel;
+      document.getElementById('achternaam').value = user.achternaam;
+      document.getElementById('emailadres').value = user.emailadres;
+      populateRoleSelect();
+      document.getElementById('rolSelect').value = user.rol;
+      document.getElementById('saveUserBtn').textContent = 'Wijzigingen opslaan';
+      userModal.classList.add('active');
+    }
+
+    function closeUserModal() {
+      userModal.classList.remove('active');
+      editingUserId = null;
+    }
+
+    async function saveUser() {
+      const voornaam = document.getElementById('voornaam').value.trim();
+      const tussenvoegsel = document.getElementById('tussenvoegsel').value.trim();
+      const achternaam = document.getElementById('achternaam').value.trim();
+      const emailadres = document.getElementById('emailadres').value.trim();
+      const rol = document.getElementById('rolSelect').value;
+
+      if (!voornaam || !achternaam || !emailadres) {
+        alert('Vul alle verplichte velden in');
+        return;
+      }
+
+      // Check of email al bestaat
+      const emailErrorEl = document.getElementById('userEmailError');
+      emailErrorEl.style.display = 'none';
+      
+      try {
+        alert('editingUserId: ' + editingUserId + ', email: ' + emailadres);
+        const emailCheckUrl = editingUserId 
+          ? API_URL + '?action=checkEmail&email=' + encodeURIComponent(emailadres) + '&exclude_id=' + editingUserId
+          : API_URL + '?action=checkEmail&email=' + encodeURIComponent(emailadres);
+        alert('URL: ' + emailCheckUrl);
+        const emailCheck = await fetch(emailCheckUrl);
+        const emailData = await emailCheck.json();
+        alert('emailData: ' + JSON.stringify(emailData));
+        
+        if (emailData.exists) {
+          emailErrorEl.textContent = 'Emailadres al in gebruik';
+          emailErrorEl.style.display = 'block';
+          return;
+        }
+        
+        // Check of naam al bestaat
+        const nameCheckUrl = editingUserId
+          ? API_URL + '?action=checkName&voornaam=' + encodeURIComponent(voornaam) + '&tussenvoegsel=' + encodeURIComponent(tussenvoegsel) + '&achternaam=' + encodeURIComponent(achternaam) + '&exclude_id=' + editingUserId
+          : API_URL + '?action=checkName&voornaam=' + encodeURIComponent(voornaam) + '&tussenvoegsel=' + encodeURIComponent(tussenvoegsel) + '&achternaam=' + encodeURIComponent(achternaam);
+        const nameCheck = await fetch(nameCheckUrl);
+        const nameData = await nameCheck.json();
+        
+        if (nameData.exists) {
+          emailErrorEl.textContent = 'Deze gebruiker bestaat al';
+          emailErrorEl.style.display = 'block';
+          return;
+        }
+      } catch (error) {
+        console.error('Validatie fout:', error);
+      }
+
+      pendingUser = {
+        id: editingUserId || Date.now().toString(),
+        voornaam,
+        tussenvoegsel,
+        achternaam,
+        emailadres,
+        rol
+      };
+
+      verificationCode = generateCode();
+      
+      // Verstuur verificatie email
+      sendVerificationEmail(emailadres, verificationCode, voornaam);
+      
+      document.getElementById('verifyEmail').textContent = emailadres;
+      closeUserModal();
+      openVerificationModal();
+    }
+
+    function deleteUser(id) {
+      const user = users.find(u => u.id == id);
+      if (!user) return;
+
+      deleteUserId = id;
+      document.getElementById('deleteUserName').textContent = `${user.voornaam} ${user.tussenvoegsel} ${user.achternaam}`.replace(/\s+/g, ' ').trim();
+      deleteModal.classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      deleteModal.classList.remove('active');
+      deleteUserId = null;
+    }
+
+    async function confirmDelete() {
+      if (deleteUserId) {
+        await fetch(API_URL + '?action=deleteUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: deleteUserId })
+        });
+        await loadUsers();
+        closeDeleteModal();
+      }
+    }
+
+    // Role functions
+    function openNewRoleModal() {
+      editingRoleId = null;
+      document.getElementById('roleModalTitle').textContent = 'Nieuwe rol';
+      document.getElementById('roleNaam').value = '';
+      document.getElementById('saveRoleBtn').textContent = 'Rol aanmaken';
+      renderPermissionsForm();
+      roleModal.classList.add('active');
+    }
+
+    function editRole(id) {
+      const role = roles.find(r => r.id == id);
+      if (!role) return;
+
+      editingRoleId = id;
+      document.getElementById('roleModalTitle').textContent = 'Rol wijzigen';
+      document.getElementById('roleNaam').value = role.naam;
+      document.getElementById('saveRoleBtn').textContent = 'Wijzigingen opslaan';
+      renderPermissionsForm(role.permissions || {});
+      roleModal.classList.add('active');
+    }
+
+    function renderPermissionsForm(currentPermissions = {}) {
+      const container = document.getElementById('permissionsContainer');
+      
+      if (contentTypes.length === 0) {
+        container.innerHTML = '<p style="color: #666;">Geen blogs beschikbaar. Maak eerst een blog aan.</p>';
+        return;
+      }
+
+      container.innerHTML = contentTypes.map(blog => {
+        const perms = currentPermissions[blog.id] || {};
+        return `
+          <div class="form-group">
+            <div class="permission-switch">
+              <span>${blog.naam}</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="perm_${blog.id}_read" ${perms.read ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="permission-switch">
+              <span>${blog.naam} aanmaken</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="perm_${blog.id}_create" ${perms.create ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="permission-switch">
+              <span>${blog.naam} bewerken</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="perm_${blog.id}_edit" ${perms.edit ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="permission-switch">
+              <span>${blog.naam} verwijderen</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="perm_${blog.id}_delete" ${perms.delete ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getPermissionsFromForm() {
+      const permissions = {};
+      
+      contentTypes.forEach(type => {
+        permissions[type.id] = {
+          read: document.getElementById(`perm_${type.id}_read`)?.checked || false,
+          create: document.getElementById(`perm_${type.id}_create`)?.checked || false,
+          edit: document.getElementById(`perm_${type.id}_edit`)?.checked || false,
+          delete: document.getElementById(`perm_${type.id}_delete`)?.checked || false
+        };
+      });
+      
+      return permissions;
+    }
+
+    function closeRoleModal() {
+      roleModal.classList.remove('active');
+      editingRoleId = null;
+    }
+
+    async function saveRole() {
+      const naam = document.getElementById('roleNaam').value.trim();
+      const permissions = getPermissionsFromForm();
+      
+      if (!naam) {
+        alert('Vul een rolnaam in');
+        return;
+      }
+
+      if (editingRoleId) {
+        await fetch(API_URL + '?action=updateRole', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingRoleId, naam, permissions })
+        });
+      } else {
+        await fetch(API_URL + '?action=addRole', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ naam, permissions })
+        });
+      }
+
+      await loadRoles();
+      closeRoleModal();
+      location.reload();
+    }
+
+    async function deleteRole(id) {
+      if (roles.length <= 1) {
+        alert('Er moet minimaal één rol zijn');
+        return;
+      }
+      
+      const role = roles.find(r => r.id == id);
+      if (users.some(u => u.rol === role.naam)) {
+        alert('Deze rol wordt nog gebruikt door gebruikers');
+        return;
+      }
+
+      await fetch(API_URL + '?action=deleteRole', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      await loadRoles();
+    }
+
+    // Verification functions
+    function generateCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function sendVerificationEmail(email, code, voornaam) {
+      // Valideer email adres
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        console.error('Ongeldig email adres:', email);
+        alert('Ongeldig emailadres. Vul een geldig emailadres in.');
+        return;
+      }
+
+      // Check of EmailJS is geconfigureerd
+      if (EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY' || 
+          !EMAILJS_CONFIG.publicKey || 
+          !EMAILJS_CONFIG.serviceId || 
+          !EMAILJS_CONFIG.templateId) {
+        console.log(`Verificatiecode voor ${email}: ${code} (EmailJS niet geconfigureerd - zie console)`);
+        return;
+      }
+
+      console.log('Versturen naar:', email, 'met code:', code);
+      
+      const templateParams = {
+        to_name: voornaam || 'Gebruiker',
+        to_email: email,
+        from_name: 'Admin Dashboard',
+        verification_code: code,
+        expiry_time: '2 minuten'
+      };
+
+      console.log('Template params:', templateParams);
+      console.log('Email:', email);
+
+      emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams)
+        .then(() => {
+          console.log(`Verificatiecode verstuurd naar ${email}: ${code}`);
+        })
+        .catch((error) => {
+          console.error('Email versturen mislukt:', error);
+          console.log(`Verificatiecode voor ${email}: ${code} (fallback naar console)`);
+        });
+    }
+
+    function openVerificationModal() {
+      timeLeft = 120;
+      document.getElementById('verifyCode').value = '';
+      document.getElementById('verificationError').style.display = 'none';
+      document.getElementById('verificationForm').style.display = 'block';
+      document.getElementById('verificationSuccess').style.display = 'none';
+      verificationModal.classList.add('active');
+      
+      startTimer();
+    }
+
+    function closeVerificationModal() {
+      verificationModal.classList.remove('active');
+      stopTimer();
+      pendingUser = null;
+      verificationCode = null;
+    }
+
+    function startTimer() {
+      stopTimer();
+      updateTimerDisplay();
+      
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          document.getElementById('verificationError').textContent = 'Code is verlopen. Vraag een nieuwe code aan.';
+          document.getElementById('verificationError').style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer');
+      timerEl.textContent = `Nog ${timeLeft} seconden`;
+      timerEl.className = timeLeft <= 30 ? 'timer warning' : 'timer';
+    }
+
+    async function verifyCode() {
+      const enteredCode = document.getElementById('verifyCode').value;
+      
+      if (enteredCode === verificationCode) {
+        document.getElementById('verificationForm').style.display = 'none';
+        document.getElementById('verificationSuccess').style.display = 'block';
+        
+        setTimeout(async () => {
+          if (editingUserId) {
+            await fetch(API_URL + '?action=updateUser', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(pendingUser)
+            });
+          } else {
+            await fetch(API_URL + '?action=addUser', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(pendingUser)
+            });
+          }
+          
+          await loadUsers();
+          closeVerificationModal();
+          populateRoleSelect();
+        }, 1500);
+      } else {
+        document.getElementById('verificationError').textContent = 'Onjuiste code. Probeer het opnieuw.';
+        document.getElementById('verificationError').style.display = 'block';
+      }
+    }
+
+    function resendCode() {
+      verificationCode = generateCode();
+      if (pendingUser) {
+        sendVerificationEmail(pendingUser.emailadres, verificationCode, pendingUser.voornaam);
+      }
+      timeLeft = 120;
+      document.getElementById('verificationError').style.display = 'none';
+      startTimer();
+    }
+
+    // Start app
+    init();
+  </script>
+</body>
+</html>
